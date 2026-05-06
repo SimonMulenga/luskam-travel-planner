@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import heroImg from "@/assets/hero-plane.jpg";
 import { SearchModule } from "./SearchModule";
 
@@ -19,12 +20,12 @@ export const Hero = () => {
             >
               Search Flights
             </a>
-            <a
-              href="#visa"
+            <Link
+              to="/visa"
               className="inline-flex items-center justify-center rounded-md border border-primary/20 bg-background px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
             >
               Apply for Visa
-            </a>
+            </Link>
           </div>
         </div>
         <div className="relative">
