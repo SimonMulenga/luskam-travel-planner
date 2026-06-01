@@ -15,7 +15,7 @@ export const Header = () => {
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="Luskam Travel Agents" className="h-9 w-9 rounded-md object-cover" width={36} height={36} />
+          <img src={logo} alt="Luskam Travel Agents" className="h-10 w-10 object-contain" width={40} height={40} />
           <div className="leading-tight">
             <div className="text-sm font-semibold text-primary">Luskam Travel Agents</div>
             <div className="text-[11px] text-muted-foreground">Experts at Adventure</div>
