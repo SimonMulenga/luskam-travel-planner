@@ -6,8 +6,8 @@ const nav = [
   { label: "Hotels", to: "/#search" },
   { label: "Cars", to: "/#search" },
   { label: "Visa", to: "/visa" },
+  { label: "Kakande Ministries", to: "/kakande" },
   { label: "About", to: "/#about" },
-  { label: "Contact", to: "/#contact" },
 ];
 
 export const Header = () => {
