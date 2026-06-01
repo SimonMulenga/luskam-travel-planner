@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import heroImg from "@/assets/hero-plane.jpg";
+import heroImg from "@/assets/photo-cabin.jpg";
 import { SearchModule } from "./SearchModule";
 
 export const Hero = () => {
@@ -32,7 +32,7 @@ export const Hero = () => {
           <div className="aspect-[4/3] w-full overflow-hidden rounded-xl shadow-md lg:aspect-auto lg:h-full">
             <img
               src={heroImg}
-              alt="Commercial airplane in flight above clouds"
+              alt="Family travelling comfortably in airline cabin"
               width={1920}
               height={1280}
               className="h-full w-full object-cover"
