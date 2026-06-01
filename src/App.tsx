@@ -10,6 +10,8 @@ import Hotels from "./pages/Hotels.tsx";
 import Cars from "./pages/Cars.tsx";
 import Visa from "./pages/Visa.tsx";
 import Checkout from "./pages/Checkout.tsx";
+import Kakande from "./pages/Kakande.tsx";
+import { FloatingContact } from "@/components/FloatingContact";
 
 const queryClient = new QueryClient();
 
@@ -26,8 +28,10 @@ const App = () => (
           <Route path="/cars" element={<Cars />} />
           <Route path="/visa" element={<Visa />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/kakande" element={<Kakande />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <FloatingContact />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
