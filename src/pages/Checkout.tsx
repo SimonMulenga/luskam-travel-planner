@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -6,6 +6,8 @@ import { generateFlights, airportLabel } from "@/data/flights";
 import { format, parseISO } from "date-fns";
 import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { createBooking, generateReference } from "@/lib/bookings";
 
 const Checkout = () => {
   const [params] = useSearchParams();
