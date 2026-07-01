@@ -5,6 +5,8 @@ import { CARS } from "@/data/cars";
 import { Users, Briefcase, Settings, Snowflake } from "lucide-react";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { createBooking, generateReference } from "@/lib/bookings";
 
 const CarsPage = () => {
   const [params] = useSearchParams();
@@ -18,9 +20,27 @@ const CarsPage = () => {
 
   const days = Math.max(1, differenceInDays(parseISO(ddate), parseISO(pdate)) || 1);
 
-  const book = (name: string, total: number) => {
-    toast.success(`${name} reserved for ${days} ${days === 1 ? "day" : "days"} · $${total}`);
-    setTimeout(() => navigate("/"), 1500);
+  const book = async (carId: string, brand: string, model: string, total: number) => {
+    const { data: sess } = await supabase.auth.getSession();
+    if (!sess.session) {
+      toast.info("Please sign in to reserve a car");
+      navigate(`/auth?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
+    try {
+      const ref = generateReference("CR");
+      await createBooking({
+        type: "car",
+        reference: ref,
+        total_amount: total,
+        travel_date: pdate,
+        details: { carId, brand, model, pickup, dropoff, pdate, ddate, ptime, dtime, days },
+      });
+      toast.success(`Reserved · ${ref}`);
+      setTimeout(() => navigate("/account"), 1200);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save reservation");
+    }
   };
 
   return (
@@ -58,7 +78,7 @@ const CarsPage = () => {
                     <div className="text-2xl font-semibold text-foreground">${total}</div>
                   </div>
                   <button
-                    onClick={() => book(`${c.brand} ${c.model}`, total)}
+                    onClick={() => book(c.id, c.brand, c.model, total)}
                     className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-[hsl(var(--primary-hover))]"
                   >
                     Reserve

@@ -11,6 +11,8 @@ import Cars from "./pages/Cars.tsx";
 import Visa from "./pages/Visa.tsx";
 import Checkout from "./pages/Checkout.tsx";
 import Kakande from "./pages/Kakande.tsx";
+import Auth from "./pages/Auth.tsx";
+import Account from "./pages/Account.tsx";
 import { FloatingContact } from "@/components/FloatingContact";
 
 const queryClient = new QueryClient();
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/visa" element={<Visa />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/kakande" element={<Kakande />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/account" element={<Account />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <FloatingContact />

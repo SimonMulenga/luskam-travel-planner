@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { Plane, Bus, Phone, CheckCircle2, FileCheck, Syringe, Activity } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -10,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { createBooking, generateReference } from "@/lib/bookings";
 import temple from "@/assets/kakande-temple.jpg";
 import team from "@/assets/kakande-team.jpg";
 
@@ -52,12 +55,13 @@ const Kakande = () => {
   const [mode, setMode] = useState<"flight" | "road">("flight");
   const [travellers, setTravellers] = useState<string>("1");
   const [submitted, setSubmitted] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const trip = useMemo(() => TRIPS.find((t) => t.id === tripId)!, [tripId]);
   const pricePer = mode === "flight" ? trip.priceFlight : trip.priceRoad;
   const total = pricePer * Number(travellers || 1);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const data = {
@@ -75,9 +79,27 @@ const Kakande = () => {
       toast.error(result.error.issues[0]?.message ?? "Please check the form");
       return;
     }
-    const ref = "KM-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-    setSubmitted(ref);
-    toast.success("Reservation received. We will confirm by phone shortly.");
+    const { data: sess } = await supabase.auth.getSession();
+    if (!sess.session) {
+      toast.info("Please sign in to complete your reservation");
+      navigate("/auth?next=/kakande");
+      return;
+    }
+    try {
+      const ref = generateReference("KM");
+      await createBooking({
+        type: "kakande",
+        reference: ref,
+        total_amount: total,
+        currency: "ZMW",
+        travel_date: null,
+        details: { trip: trip.month, mode, travellers, ...data },
+      });
+      setSubmitted(ref);
+      toast.success("Reservation received. We will confirm by phone shortly.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save reservation");
+    }
   };
 
   return (

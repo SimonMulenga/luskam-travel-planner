@@ -6,6 +6,8 @@ import { generateHotels } from "@/data/hotels";
 import { Star, MapPin } from "lucide-react";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { createBooking, generateReference } from "@/lib/bookings";
 
 const HotelsPage = () => {
   const [params] = useSearchParams();
@@ -19,9 +21,28 @@ const HotelsPage = () => {
   const nights = Math.max(1, differenceInDays(parseISO(checkOut), parseISO(checkIn)));
   const hotels = useMemo(() => generateHotels(dest), [dest]);
 
-  const book = (id: string, name: string, price: number) => {
-    toast.success(`${name} reserved for ${nights} ${nights === 1 ? "night" : "nights"} · $${price * nights * rooms}`);
-    setTimeout(() => navigate("/"), 1500);
+  const book = async (id: string, name: string, price: number, city: string) => {
+    const { data: sess } = await supabase.auth.getSession();
+    if (!sess.session) {
+      toast.info("Please sign in to reserve a hotel");
+      navigate(`/auth?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
+    try {
+      const total = price * nights * rooms;
+      const ref = generateReference("HT");
+      await createBooking({
+        type: "hotel",
+        reference: ref,
+        total_amount: total,
+        travel_date: checkIn,
+        details: { hotelId: id, name, city, nights, rooms, adults, checkIn, checkOut, pricePerNight: price },
+      });
+      toast.success(`Reserved · ${ref}`);
+      setTimeout(() => navigate("/account"), 1200);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save reservation");
+    }
   };
 
   return (
@@ -59,7 +80,7 @@ const HotelsPage = () => {
                   <div className="text-xs text-muted-foreground">Includes taxes & fees</div>
                 </div>
                 <button
-                  onClick={() => book(h.id, h.name, h.pricePerNight)}
+                  onClick={() => book(h.id, h.name, h.pricePerNight, h.city)}
                   className="mt-3 w-full rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-[hsl(var(--primary-hover))]"
                 >
                   Reserve
