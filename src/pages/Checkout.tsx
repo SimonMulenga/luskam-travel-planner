@@ -57,15 +57,40 @@ const Checkout = () => {
   const update = (i: number, k: string, v: string) =>
     setPax((p) => p.map((x, idx) => (idx === i ? { ...x, [k]: v } : x)));
 
-  const submit = (e: React.FormEvent) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        toast.info("Please sign in to complete your booking");
+        navigate(`/auth?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      }
+    });
+  }, [navigate]);
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!contact.email || pax.some((p) => !p.firstName || !p.lastName)) {
       toast.error("Please complete all traveler details");
       return;
     }
-    const ref = "LK" + Math.random().toString(36).slice(2, 8).toUpperCase();
-    setConfirmed(ref);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!offer) return;
+    try {
+      const ref = generateReference("LK");
+      await createBooking({
+        type: "flight",
+        reference: ref,
+        total_amount: total,
+        travel_date: depart,
+        payment_status: "paid",
+        details: {
+          airline: offer.airline, code: offer.code, from, to, depart, cabin,
+          fareType: offer.fareType, adults, children, infants, contact, pax,
+        },
+      });
+      setConfirmed(ref);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not confirm booking");
+    }
   };
 
   if (confirmed) {
