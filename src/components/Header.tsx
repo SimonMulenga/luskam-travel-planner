@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/luskam-logo.jpeg";
 
 const nav = [
@@ -11,6 +12,7 @@ const nav = [
 ];
 
 export const Header = () => {
+  const { user } = useAuth();
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container flex h-16 items-center justify-between">
@@ -29,8 +31,12 @@ export const Header = () => {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <a href="tel:+260773918145" className="hidden text-sm font-medium text-primary hover:underline md:block">+260 773 918 145</a>
-          <Link to="/visa" className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted">Apply for visa</Link>
+          <a href="tel:+260773918145" className="hidden text-sm font-medium text-primary hover:underline lg:block">+260 773 918 145</a>
+          {user ? (
+            <Link to="/account" className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted">My account</Link>
+          ) : (
+            <Link to="/auth" className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted">Sign in</Link>
+          )}
         </div>
       </div>
     </header>
