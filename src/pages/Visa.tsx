@@ -4,6 +4,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { createBooking, generateReference } from "@/lib/bookings";
 
 const COUNTRIES = [
   "United Arab Emirates", "United Kingdom", "United States", "Schengen Area", "China",
@@ -34,16 +36,35 @@ const VisaPage = () => {
 
   const update = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const required = ["travelDate", "firstName", "lastName", "dob", "nationality", "passport", "passportExpiry", "email", "phone"];
     if (required.some((k) => !(form as Record<string, string>)[k])) {
       toast.error("Please complete all required fields");
       return;
     }
-    const ref = "VA" + Math.random().toString(36).slice(2, 8).toUpperCase();
-    setSubmitted(ref);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const { data: sess } = await supabase.auth.getSession();
+    if (!sess.session) {
+      toast.info("Please sign in to submit your application");
+      navigate("/auth?next=/visa");
+      return;
+    }
+    try {
+      const ref = generateReference("VA");
+      await createBooking({
+        type: "visa",
+        reference: ref,
+        total_amount: 0,
+        travel_date: form.travelDate,
+        status: "pending",
+        payment_status: "pending",
+        details: { ...form },
+      });
+      setSubmitted(ref);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not submit application");
+    }
   };
 
   if (submitted) {
