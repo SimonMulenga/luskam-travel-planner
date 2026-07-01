@@ -66,14 +66,8 @@ const Checkout = () => {
   const update = (i: number, k: string, v: string) =>
     setPax((p) => p.map((x, idx) => (idx === i ? { ...x, [k]: v } : x)));
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
-        toast.info("Please sign in to complete your booking");
-        navigate(`/auth?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
-      }
-    });
-  }, [navigate]);
+
+
 
 
 
