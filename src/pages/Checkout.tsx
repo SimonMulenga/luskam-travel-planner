@@ -38,6 +38,15 @@ const Checkout = () => {
   const [contact, setContact] = useState({ email: "", phone: "" });
   const [confirmed, setConfirmed] = useState<string | null>(null);
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        toast.info("Please sign in to complete your booking");
+        navigate(`/auth?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      }
+    });
+  }, [navigate]);
+
   if (!offer) {
     return (
       <div className="min-h-screen bg-background">
@@ -65,6 +74,8 @@ const Checkout = () => {
       }
     });
   }, [navigate]);
+
+
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
