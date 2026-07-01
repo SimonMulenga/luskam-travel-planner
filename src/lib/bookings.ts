@@ -29,7 +29,7 @@ export const createBooking = async (input: CreateBookingInput) => {
       travel_date: input.travel_date ?? null,
       status: input.status ?? "confirmed",
       payment_status: input.payment_status ?? "pending",
-      details: input.details,
+      details: input.details as never,
     })
     .select()
     .single();
