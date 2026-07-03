@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Plane, ArrowRight } from "lucide-react";
-import { generateFlights, airportLabel } from "@/data/flights";
+import { Plane, ArrowRight, Radio, Loader2 } from "lucide-react";
+import { generateFlights, airportLabel, type FlightOffer } from "@/data/flights";
 import { format, parseISO } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 const FlightsPage = () => {
   const [params] = useSearchParams();
