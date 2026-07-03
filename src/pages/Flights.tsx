@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Plane, ArrowRight } from "lucide-react";
-import { generateFlights, airportLabel } from "@/data/flights";
+import { Plane, ArrowRight, Radio, Loader2 } from "lucide-react";
+import { generateFlights, airportLabel, type FlightOffer } from "@/data/flights";
 import { format, parseISO } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 const FlightsPage = () => {
   const [params] = useSearchParams();
@@ -21,9 +22,35 @@ const FlightsPage = () => {
   const trip = params.get("trip") || "return";
   const totalPax = adults + children + infants;
 
-  const offers = useMemo(() => generateFlights(from, to, depart, cabin), [from, to, depart, cabin]);
+  const generated = useMemo(() => generateFlights(from, to, depart, cabin), [from, to, depart, cabin]);
+  const [liveOffers, setLiveOffers] = useState<FlightOffer[]>([]);
+  const [liveLoading, setLiveLoading] = useState(true);
+  const [liveError, setLiveError] = useState<string | null>(null);
   const [sort, setSort] = useState<"price" | "duration" | "depart">("price");
   const [stopFilter, setStopFilter] = useState<"all" | "direct" | "1stop">("all");
+
+  useEffect(() => {
+    let cancelled = false;
+    setLiveLoading(true);
+    setLiveError(null);
+    supabase.functions
+      .invoke("flight-search", { body: { from, to, depart, cabin } })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          setLiveError("Live search unavailable — showing indicative options.");
+        } else {
+          const arr = ((data as { flights?: FlightOffer[] })?.flights ?? []) as FlightOffer[];
+          setLiveOffers(arr);
+        }
+      })
+      .finally(() => !cancelled && setLiveLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [from, to, depart, cabin]);
+
+  const offers = liveOffers.length ? [...liveOffers, ...generated] : generated;
 
   const filtered = offers
     .filter((o) => (stopFilter === "all" ? true : stopFilter === "direct" ? o.stops === "Direct" : o.stops !== "Direct"))
@@ -84,7 +111,20 @@ const FlightsPage = () => {
           </aside>
 
           <div className="space-y-3">
-            <div className="text-sm text-muted-foreground">{filtered.length} results · prices in USD per traveler</div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{filtered.length} results · prices in USD per traveler</span>
+              {liveLoading ? (
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" /> Fetching live schedules…
+                </span>
+              ) : liveOffers.length > 0 ? (
+                <span className="flex items-center gap-1.5 text-xs font-medium text-primary">
+                  <Radio className="h-3 w-3" /> {liveOffers.length} live schedules
+                </span>
+              ) : liveError ? (
+                <span className="text-xs text-muted-foreground">{liveError}</span>
+              ) : null}
+            </div>
             {filtered.map((r) => (
               <article key={r.id} className="grid grid-cols-12 items-center gap-4 rounded-lg bg-card px-5 py-5 ring-1 ring-border">
                 <div className="col-span-12 flex items-center gap-3 sm:col-span-3">
@@ -92,7 +132,12 @@ const FlightsPage = () => {
                     <Plane className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-foreground">{r.airline}</div>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                      {r.airline}
+                      {r.live && (
+                        <span className="rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">Live</span>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground">{r.code} · {r.fareType}</div>
                   </div>
                 </div>

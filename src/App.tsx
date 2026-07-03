@@ -13,7 +13,9 @@ import Checkout from "./pages/Checkout.tsx";
 import Kakande from "./pages/Kakande.tsx";
 import Auth from "./pages/Auth.tsx";
 import Account from "./pages/Account.tsx";
+import Admin from "./pages/Admin.tsx";
 import { FloatingContact } from "@/components/FloatingContact";
+import { AiAssistant } from "@/components/AiAssistant";
 
 const queryClient = new QueryClient();
 
@@ -33,9 +35,11 @@ const App = () => (
           <Route path="/kakande" element={<Kakande />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <FloatingContact />
+        <AiAssistant />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

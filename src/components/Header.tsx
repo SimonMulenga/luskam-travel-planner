@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useRoles } from "@/hooks/useRoles";
 import logo from "@/assets/luskam-logo.jpeg";
 
 const nav = [
@@ -13,6 +14,7 @@ const nav = [
 
 export const Header = () => {
   const { user } = useAuth();
+  const { isAgent } = useRoles();
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container flex h-16 items-center justify-between">
@@ -32,6 +34,9 @@ export const Header = () => {
         </nav>
         <div className="flex items-center gap-2">
           <a href="tel:+260773918145" className="hidden text-sm font-medium text-primary hover:underline lg:block">+260 773 918 145</a>
+          {isAgent && (
+            <Link to="/admin" className="rounded-md bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/15">Admin</Link>
+          )}
           {user ? (
             <Link to="/account" className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted">My account</Link>
           ) : (
