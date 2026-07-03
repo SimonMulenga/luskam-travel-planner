@@ -13,7 +13,9 @@ import Checkout from "./pages/Checkout.tsx";
 import Kakande from "./pages/Kakande.tsx";
 import Auth from "./pages/Auth.tsx";
 import Account from "./pages/Account.tsx";
+import Admin from "./pages/Admin.tsx";
 import { FloatingContact } from "@/components/FloatingContact";
+import { AiAssistant } from "@/components/AiAssistant";
 
 const queryClient = new QueryClient();
 
