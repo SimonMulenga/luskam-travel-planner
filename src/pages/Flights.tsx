@@ -22,9 +22,35 @@ const FlightsPage = () => {
   const trip = params.get("trip") || "return";
   const totalPax = adults + children + infants;
 
-  const offers = useMemo(() => generateFlights(from, to, depart, cabin), [from, to, depart, cabin]);
+  const generated = useMemo(() => generateFlights(from, to, depart, cabin), [from, to, depart, cabin]);
+  const [liveOffers, setLiveOffers] = useState<FlightOffer[]>([]);
+  const [liveLoading, setLiveLoading] = useState(true);
+  const [liveError, setLiveError] = useState<string | null>(null);
   const [sort, setSort] = useState<"price" | "duration" | "depart">("price");
   const [stopFilter, setStopFilter] = useState<"all" | "direct" | "1stop">("all");
+
+  useEffect(() => {
+    let cancelled = false;
+    setLiveLoading(true);
+    setLiveError(null);
+    supabase.functions
+      .invoke("flight-search", { body: { from, to, depart, cabin } })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          setLiveError("Live search unavailable — showing indicative options.");
+        } else {
+          const arr = ((data as { flights?: FlightOffer[] })?.flights ?? []) as FlightOffer[];
+          setLiveOffers(arr);
+        }
+      })
+      .finally(() => !cancelled && setLiveLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [from, to, depart, cabin]);
+
+  const offers = liveOffers.length ? [...liveOffers, ...generated] : generated;
 
   const filtered = offers
     .filter((o) => (stopFilter === "all" ? true : stopFilter === "direct" ? o.stops === "Direct" : o.stops !== "Direct"))
