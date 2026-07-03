@@ -35,9 +35,11 @@ const App = () => (
           <Route path="/kakande" element={<Kakande />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <FloatingContact />
+        <AiAssistant />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
