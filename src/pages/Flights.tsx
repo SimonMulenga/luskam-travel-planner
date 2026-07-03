@@ -111,7 +111,20 @@ const FlightsPage = () => {
           </aside>
 
           <div className="space-y-3">
-            <div className="text-sm text-muted-foreground">{filtered.length} results · prices in USD per traveler</div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{filtered.length} results · prices in USD per traveler</span>
+              {liveLoading ? (
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" /> Fetching live schedules…
+                </span>
+              ) : liveOffers.length > 0 ? (
+                <span className="flex items-center gap-1.5 text-xs font-medium text-primary">
+                  <Radio className="h-3 w-3" /> {liveOffers.length} live schedules
+                </span>
+              ) : liveError ? (
+                <span className="text-xs text-muted-foreground">{liveError}</span>
+              ) : null}
+            </div>
             {filtered.map((r) => (
               <article key={r.id} className="grid grid-cols-12 items-center gap-4 rounded-lg bg-card px-5 py-5 ring-1 ring-border">
                 <div className="col-span-12 flex items-center gap-3 sm:col-span-3">
@@ -119,7 +132,12 @@ const FlightsPage = () => {
                     <Plane className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-foreground">{r.airline}</div>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                      {r.airline}
+                      {r.live && (
+                        <span className="rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">Live</span>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground">{r.code} · {r.fareType}</div>
                   </div>
                 </div>
