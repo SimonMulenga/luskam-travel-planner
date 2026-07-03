@@ -12,7 +12,9 @@ export interface FlightOffer {
   stops: string;
   cabin: string;
   price: number;
-  fareType: "Economy Promo" | "Economy Semi-Flex" | "Economy Flex";
+  fareType: "Economy Promo" | "Economy Semi-Flex" | "Economy Flex" | string;
+  live?: boolean;
+  status?: string;
 }
 
 const AIRLINES = [
