@@ -34,6 +34,9 @@ export const Header = () => {
         </nav>
         <div className="flex items-center gap-2">
           <a href="tel:+260773918145" className="hidden text-sm font-medium text-primary hover:underline lg:block">+260 773 918 145</a>
+          {isAgent && (
+            <Link to="/admin" className="rounded-md bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/15">Admin</Link>
+          )}
           {user ? (
             <Link to="/account" className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted">My account</Link>
           ) : (
