@@ -85,7 +85,8 @@ const Checkout = () => {
         reference: ref,
         total_amount: total,
         travel_date: depart,
-        payment_status: "paid",
+        status: "pending",
+        payment_status: "pending",
         details: {
           airline: offer.airline, code: offer.code, from, to, depart, cabin,
           fareType: offer.fareType, adults, children, infants, contact, pax,
@@ -107,8 +108,10 @@ const Checkout = () => {
             <div className="flex items-start gap-4">
               <CheckCircle2 className="h-10 w-10 text-primary" />
               <div>
-                <h1 className="text-2xl font-semibold text-foreground">Booking confirmed</h1>
-                <p className="mt-1 text-sm text-muted-foreground">A confirmation email has been sent to {contact.email}.</p>
+                <h1 className="text-2xl font-semibold text-foreground">Reservation received</h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  We've held your seats. Complete payment to confirm — an agent will contact {contact.email} within a few minutes.
+                </p>
               </div>
             </div>
             <div className="mt-6 rounded-md bg-surface p-4 ring-1 ring-border">
@@ -120,9 +123,36 @@ const Checkout = () => {
               <div><dt className="text-muted-foreground">Departure</dt><dd className="font-medium text-foreground">{format(parseISO(depart), "dd MMM yyyy")}</dd></div>
               <div><dt className="text-muted-foreground">Airline</dt><dd className="font-medium text-foreground">{offer.airline} {offer.code}</dd></div>
               <div><dt className="text-muted-foreground">Travelers</dt><dd className="font-medium text-foreground">{totalPax}</dd></div>
-              <div><dt className="text-muted-foreground">Total paid</dt><dd className="font-semibold text-foreground">${total}</dd></div>
+              <div className="col-span-2"><dt className="text-muted-foreground">Amount due</dt><dd className="font-semibold text-foreground text-lg">${total}</dd></div>
             </dl>
-            <button onClick={() => navigate("/")} className="mt-8 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-[hsl(var(--primary-hover))]">Back to home</button>
+
+            <div className="mt-6 rounded-md bg-primary/5 p-4 ring-1 ring-primary/20">
+              <div className="text-sm font-semibold text-primary">How to pay</div>
+              <ul className="mt-2 space-y-1.5 text-sm text-foreground">
+                <li>• <strong>Mobile Money</strong> (MTN / Airtel) to <strong>+260 979 450 446</strong> — use reference <strong>{confirmed}</strong></li>
+                <li>• <strong>Bank transfer</strong> — WhatsApp us for details</li>
+                <li>• <strong>Cash</strong> at our Lusaka office</li>
+              </ul>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href={`https://wa.me/260773918145?text=${encodeURIComponent(`Hello, I have just made a reservation ${confirmed} for $${total}. I'd like to complete payment.`)}`}
+                  target="_blank" rel="noreferrer"
+                  className="rounded-md bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1ebe5d]"
+                >WhatsApp us to pay</a>
+                <a href="tel:+260979450446" className="rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground">
+                  Call +260 979 450 446
+                </a>
+              </div>
+            </div>
+
+            <div className="mt-6 flex gap-3">
+              <button onClick={() => navigate("/account")} className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-[hsl(var(--primary-hover))]">
+                View my bookings
+              </button>
+              <button onClick={() => navigate("/")} className="rounded-md border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted">
+                Back to home
+              </button>
+            </div>
           </div>
         </main>
         <Footer />
