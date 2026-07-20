@@ -113,6 +113,18 @@ const AccountPage = () => {
                         {b.travel_date ? `Travel ${format(new Date(b.travel_date), "dd MMM yyyy")} · ` : ""}
                         Created {format(new Date(b.created_at), "dd MMM yyyy")}
                       </div>
+                      {b.payment_status === "pending" && b.status !== "cancelled" && (
+                        <div className="mt-2 rounded-md bg-primary/5 px-3 py-2 text-[11px] text-foreground ring-1 ring-primary/20">
+                          Pay to <strong>+260 979 450 446</strong> (MTN/Airtel) using reference <strong>{b.reference}</strong>.{" "}
+                          <a
+                            href={`https://wa.me/260773918145?text=${encodeURIComponent(`Hello, booking ${b.reference} for ${b.currency} ${Number(b.total_amount).toFixed(2)} — I'd like to pay.`)}`}
+                            target="_blank" rel="noreferrer"
+                            className="font-semibold text-primary hover:underline"
+                          >
+                            WhatsApp to pay →
+                          </a>
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       <div className="text-sm font-semibold text-foreground">{b.currency} {Number(b.total_amount).toFixed(2)}</div>
@@ -120,6 +132,20 @@ const AccountPage = () => {
                         <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ${STATUS_COLOR[b.status] ?? "bg-muted text-foreground ring-border"}`}>{b.status}</span>
                         <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ${STATUS_COLOR[b.payment_status] ?? "bg-muted text-foreground ring-border"}`}>{b.payment_status}</span>
                       </div>
+                      {b.status !== "cancelled" && b.status !== "completed" && b.payment_status !== "paid" && (
+                        <button
+                          onClick={async () => {
+                            if (!confirm(`Cancel booking ${b.reference}?`)) return;
+                            const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", b.id);
+                            if (error) return toast.error(error.message);
+                            toast.success("Booking cancelled");
+                            setBookings((prev) => prev.map((x) => (x.id === b.id ? { ...x, status: "cancelled" } : x)));
+                          }}
+                          className="text-[11px] font-medium text-destructive hover:underline"
+                        >
+                          Cancel booking
+                        </button>
+                      )}
                     </div>
                   </li>
                 ))}
