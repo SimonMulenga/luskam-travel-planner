@@ -3,8 +3,15 @@ import { Phone, MessageCircle, Facebook, X, MessagesSquare } from "lucide-react"
 
 const actions = [
   {
-    label: "WhatsApp",
+    label: "WhatsApp · 773 918 145",
     href: "https://wa.me/260773918145?text=Hello%20Luskam%20Travel%20Agents%2C%20I%20would%20like%20to%20enquire%20about%20a%20booking.",
+    icon: MessageCircle,
+    className: "bg-[#25D366] hover:bg-[#1ebe5d] text-white",
+    external: true,
+  },
+  {
+    label: "WhatsApp · 976 652 877",
+    href: "https://wa.me/260976652877?text=Hello%20Luskam%20Travel%20Agents%2C%20I%20would%20like%20to%20enquire%20about%20a%20booking.",
     icon: MessageCircle,
     className: "bg-[#25D366] hover:bg-[#1ebe5d] text-white",
     external: true,
@@ -17,8 +24,8 @@ const actions = [
     external: true,
   },
   {
-    label: "Call us",
-    href: "tel:+260773918145",
+    label: "Call · 979 450 446",
+    href: "tel:+260979450446",
     icon: Phone,
     className: "bg-primary hover:bg-primary/90 text-primary-foreground",
     external: false,
