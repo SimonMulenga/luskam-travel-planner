@@ -197,12 +197,26 @@ const Checkout = () => {
             ))}
 
             <section className="rounded-lg bg-card p-6 ring-1 ring-border">
-              <h2 className="text-base font-semibold text-foreground">Payment</h2>
-              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2"><Input label="Cardholder name" required /></div>
-                <div className="sm:col-span-2"><Input label="Card number" placeholder="1234 5678 9012 3456" required /></div>
-                <Input label="Expiry (MM/YY)" required />
-                <Input label="CVV" required />
+              <h2 className="text-base font-semibold text-foreground">Payment method</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                We'll hold your seats immediately. Complete payment via any of the options below and our agent confirms your booking on your account.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-md border border-border p-4">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-primary">Mobile Money</div>
+                  <div className="mt-1 text-sm font-medium text-foreground">MTN / Airtel</div>
+                  <div className="mt-1 text-sm text-muted-foreground">+260 979 450 446</div>
+                </div>
+                <div className="rounded-md border border-border p-4">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-primary">Bank transfer</div>
+                  <div className="mt-1 text-sm font-medium text-foreground">Zambian & int'l bank</div>
+                  <div className="mt-1 text-sm text-muted-foreground">Details sent on WhatsApp</div>
+                </div>
+                <div className="rounded-md border border-border p-4">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-primary">Office</div>
+                  <div className="mt-1 text-sm font-medium text-foreground">Cash payment</div>
+                  <div className="mt-1 text-sm text-muted-foreground">Lusaka, Zambia</div>
+                </div>
               </div>
             </section>
           </div>
@@ -222,9 +236,9 @@ const Checkout = () => {
               <div className="flex justify-between border-t border-border pt-3 text-base font-semibold"><dt className="text-foreground">Total</dt><dd className="text-foreground">${total}</dd></div>
             </dl>
             <button type="submit" className="mt-6 w-full rounded-md bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground hover:bg-[hsl(var(--accent-hover))]">
-              Confirm and pay ${total}
+              Reserve now — pay after
             </button>
-            <p className="mt-3 text-[11px] text-muted-foreground">By confirming you agree to Luskam Travel Agents' terms of service.</p>
+            <p className="mt-3 text-[11px] text-muted-foreground">Reservation is instant. Payment instructions appear on the next screen. By reserving you agree to our terms of service.</p>
           </aside>
         </form>
       </main>
