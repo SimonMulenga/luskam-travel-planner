@@ -37,8 +37,24 @@ export const Footer = () => {
         <div>
           <h4 className="text-sm font-semibold text-foreground">Contact</h4>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>+260 773 918 145</li>
-            <li>luskamtravelagents@gmail.com</li>
+            <li>
+              <a href="https://wa.me/260773918145" target="_blank" rel="noreferrer" className="hover:text-primary">
+                WhatsApp: +260 773 918 145
+              </a>
+            </li>
+            <li>
+              <a href="https://wa.me/260976652877" target="_blank" rel="noreferrer" className="hover:text-primary">
+                WhatsApp: +260 976 652 877
+              </a>
+            </li>
+            <li>
+              <a href="tel:+260979450446" className="hover:text-primary">Call: +260 979 450 446</a>
+            </li>
+            <li>
+              <a href="mailto:luskamtravelagents@gmail.com" className="hover:text-primary">
+                luskamtravelagents@gmail.com
+              </a>
+            </li>
             <li>Lusaka, Zambia</li>
           </ul>
         </div>
