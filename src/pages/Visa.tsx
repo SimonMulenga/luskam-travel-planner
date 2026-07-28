@@ -14,6 +14,36 @@ const COUNTRIES = [
 
 const VISA_TYPES = ["Tourist", "Business", "Transit", "Student", "Work"];
 
+const WHATSAPP_NUMBERS = [
+  { label: "773 918 145", number: "260773918145" },
+  { label: "976 652 877", number: "260976652877" },
+];
+
+const buildWhatsappMessage = (ref: string, form: Record<string, string>) =>
+  [
+    `*New Visa Application* (Ref: ${ref})`,
+    "",
+    `Destination: ${form.country}`,
+    `Visa type: ${form.visaType}`,
+    `Travel date: ${form.travelDate}`,
+    `Duration: ${form.duration} days`,
+    "",
+    `Name: ${form.firstName} ${form.lastName}`,
+    `Date of birth: ${form.dob}`,
+    `Nationality: ${form.nationality}`,
+    `Passport: ${form.passport} (expires ${form.passportExpiry})`,
+    "",
+    `Email: ${form.email}`,
+    `Phone: ${form.phone}`,
+    form.address ? `Address: ${form.address}` : "",
+    form.notes ? `Notes: ${form.notes}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+const whatsappLink = (number: string, message: string) =>
+  `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+
 const VisaPage = () => {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState<string | null>(null);
@@ -60,6 +90,10 @@ const VisaPage = () => {
         payment_status: "pending",
         details: { ...form },
       });
+      const message = buildWhatsappMessage(ref, form);
+      WHATSAPP_NUMBERS.forEach((n, i) => {
+        setTimeout(() => window.open(whatsappLink(n.number, message), "_blank", "noopener,noreferrer"), i * 600);
+      });
       setSubmitted(ref);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -83,6 +117,25 @@ const VisaPage = () => {
             <div className="mt-6 rounded-md bg-surface p-4 ring-1 ring-border">
               <div className="text-xs uppercase tracking-wide text-muted-foreground">Application reference</div>
               <div className="mt-1 font-mono text-xl font-semibold text-foreground">{submitted}</div>
+            </div>
+            <div className="mt-6 rounded-md bg-surface p-4 ring-1 ring-border">
+              <div className="text-sm font-semibold text-foreground">Send your application on WhatsApp</div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Two WhatsApp chats should have opened automatically. If not, tap a number below to send your details.
+              </p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                {WHATSAPP_NUMBERS.map((n) => (
+                  <a
+                    key={n.number}
+                    href={whatsappLink(n.number, buildWhatsappMessage(submitted, form))}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="rounded-md bg-[#25D366] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#1ebe5d]"
+                  >
+                    WhatsApp {n.label}
+                  </a>
+                ))}
+              </div>
             </div>
             <button onClick={() => navigate("/")} className="mt-8 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-[hsl(var(--primary-hover))]">Back to home</button>
           </div>
