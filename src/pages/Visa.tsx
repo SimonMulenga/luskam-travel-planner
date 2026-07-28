@@ -14,6 +14,36 @@ const COUNTRIES = [
 
 const VISA_TYPES = ["Tourist", "Business", "Transit", "Student", "Work"];
 
+const WHATSAPP_NUMBERS = [
+  { label: "773 918 145", number: "260773918145" },
+  { label: "976 652 877", number: "260976652877" },
+];
+
+const buildWhatsappMessage = (ref: string, form: Record<string, string>) =>
+  [
+    `*New Visa Application* (Ref: ${ref})`,
+    "",
+    `Destination: ${form.country}`,
+    `Visa type: ${form.visaType}`,
+    `Travel date: ${form.travelDate}`,
+    `Duration: ${form.duration} days`,
+    "",
+    `Name: ${form.firstName} ${form.lastName}`,
+    `Date of birth: ${form.dob}`,
+    `Nationality: ${form.nationality}`,
+    `Passport: ${form.passport} (expires ${form.passportExpiry})`,
+    "",
+    `Email: ${form.email}`,
+    `Phone: ${form.phone}`,
+    form.address ? `Address: ${form.address}` : "",
+    form.notes ? `Notes: ${form.notes}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+const whatsappLink = (number: string, message: string) =>
+  `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+
 const VisaPage = () => {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState<string | null>(null);
