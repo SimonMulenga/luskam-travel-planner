@@ -73,23 +73,24 @@ const VisaPage = () => {
       toast.error("Please complete all required fields");
       return;
     }
-    const { data: sess } = await supabase.auth.getSession();
-    if (!sess.session) {
-      toast.info("Please sign in to submit your application");
-      navigate("/auth?next=/visa");
-      return;
-    }
     try {
       const ref = generateReference("VA");
-      await createBooking({
-        type: "visa",
-        reference: ref,
-        total_amount: 0,
-        travel_date: form.travelDate,
-        status: "pending",
-        payment_status: "pending",
-        details: { ...form },
-      });
+      const { data: sess } = await supabase.auth.getSession();
+      if (sess.session) {
+        try {
+          await createBooking({
+            type: "visa",
+            reference: ref,
+            total_amount: 0,
+            travel_date: form.travelDate,
+            status: "pending",
+            payment_status: "pending",
+            details: { ...form },
+          });
+        } catch {
+          // continue to WhatsApp even if saving fails
+        }
+      }
       const message = buildWhatsappMessage(ref, form);
       WHATSAPP_NUMBERS.forEach((n, i) => {
         setTimeout(() => window.open(whatsappLink(n.number, message), "_blank", "noopener,noreferrer"), i * 600);
