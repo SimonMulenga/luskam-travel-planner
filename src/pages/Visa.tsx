@@ -90,6 +90,10 @@ const VisaPage = () => {
         payment_status: "pending",
         details: { ...form },
       });
+      const message = buildWhatsappMessage(ref, form);
+      WHATSAPP_NUMBERS.forEach((n, i) => {
+        setTimeout(() => window.open(whatsappLink(n.number, message), "_blank", "noopener,noreferrer"), i * 600);
+      });
       setSubmitted(ref);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
