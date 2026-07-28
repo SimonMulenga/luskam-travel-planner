@@ -118,6 +118,25 @@ const VisaPage = () => {
               <div className="text-xs uppercase tracking-wide text-muted-foreground">Application reference</div>
               <div className="mt-1 font-mono text-xl font-semibold text-foreground">{submitted}</div>
             </div>
+            <div className="mt-6 rounded-md bg-surface p-4 ring-1 ring-border">
+              <div className="text-sm font-semibold text-foreground">Send your application on WhatsApp</div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Two WhatsApp chats should have opened automatically. If not, tap a number below to send your details.
+              </p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                {WHATSAPP_NUMBERS.map((n) => (
+                  <a
+                    key={n.number}
+                    href={whatsappLink(n.number, buildWhatsappMessage(submitted, form))}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="rounded-md bg-[#25D366] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#1ebe5d]"
+                  >
+                    WhatsApp {n.label}
+                  </a>
+                ))}
+              </div>
+            </div>
             <button onClick={() => navigate("/")} className="mt-8 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-[hsl(var(--primary-hover))]">Back to home</button>
           </div>
         </main>
