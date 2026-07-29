@@ -44,6 +44,7 @@ const buildWhatsappMessage = (ref: string, form: Record<string, string>) =>
 const whatsappLink = (number: string, message: string) =>
   `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 
+
 const VisaPage = () => {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState<string | null>(null);
@@ -91,12 +92,9 @@ const VisaPage = () => {
           // continue to WhatsApp even if saving fails
         }
       }
-      const message = buildWhatsappMessage(ref, form);
-      WHATSAPP_NUMBERS.forEach((n, i) => {
-        setTimeout(() => window.open(whatsappLink(n.number, message), "_blank", "noopener,noreferrer"), i * 600);
-      });
       setSubmitted(ref);
       window.scrollTo({ top: 0, behavior: "smooth" });
+
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not submit application");
     }
