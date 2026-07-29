@@ -39,6 +39,14 @@ const requirements = [
   { icon: Activity, title: "Vitals", body: "Recent results for Blood Pressure, HIV and Sugar tests." },
 ];
 
+const WHATSAPP_NUMBERS = [
+  { label: "773 918 145", number: "260773918145" },
+  { label: "976 652 877", number: "260976652877" },
+];
+
+const whatsappLink = (number: string, message: string) =>
+  `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+
 const schema = z.object({
   fullName: z.string().trim().min(2, "Enter your full name").max(80),
   phone: z.string().trim().min(7, "Enter a valid phone number").max(20),
