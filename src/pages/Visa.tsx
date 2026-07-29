@@ -120,8 +120,9 @@ const VisaPage = () => {
             <div className="mt-6 rounded-md bg-surface p-4 ring-1 ring-border">
               <div className="text-sm font-semibold text-foreground">Send your application on WhatsApp</div>
               <p className="mt-1 text-xs text-muted-foreground">
-                Two WhatsApp chats should have opened automatically. If not, tap a number below to send your details.
+                Tap a number below to open WhatsApp with your application details prefilled, then press send.
               </p>
+
               <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                 {WHATSAPP_NUMBERS.map((n) => (
                   <a
