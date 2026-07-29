@@ -39,6 +39,14 @@ const requirements = [
   { icon: Activity, title: "Vitals", body: "Recent results for Blood Pressure, HIV and Sugar tests." },
 ];
 
+const WHATSAPP_NUMBERS = [
+  { label: "773 918 145", number: "260773918145" },
+  { label: "976 652 877", number: "260976652877" },
+];
+
+const whatsappLink = (number: string, message: string) =>
+  `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+
 const schema = z.object({
   fullName: z.string().trim().min(2, "Enter your full name").max(80),
   phone: z.string().trim().min(7, "Enter a valid phone number").max(20),
@@ -55,6 +63,7 @@ const Kakande = () => {
   const [mode, setMode] = useState<"flight" | "road">("flight");
   const [travellers, setTravellers] = useState<string>("1");
   const [submitted, setSubmitted] = useState<string | null>(null);
+  const [waMessage, setWaMessage] = useState<string>("");
   const navigate = useNavigate();
 
   const trip = useMemo(() => TRIPS.find((t) => t.id === tripId)!, [tripId]);
@@ -79,27 +88,43 @@ const Kakande = () => {
       toast.error(result.error.issues[0]?.message ?? "Please check the form");
       return;
     }
+    const ref = generateReference("KM");
     const { data: sess } = await supabase.auth.getSession();
-    if (!sess.session) {
-      toast.info("Please sign in to complete your reservation");
-      navigate("/auth?next=/kakande");
-      return;
+    if (sess.session) {
+      try {
+        await createBooking({
+          type: "kakande",
+          reference: ref,
+          total_amount: total,
+          currency: "ZMW",
+          travel_date: null,
+          details: { trip: trip.month, mode, travellers, ...data },
+        });
+      } catch {
+        // continue to WhatsApp even if saving fails
+      }
     }
-    try {
-      const ref = generateReference("KM");
-      await createBooking({
-        type: "kakande",
-        reference: ref,
-        total_amount: total,
-        currency: "ZMW",
-        travel_date: null,
-        details: { trip: trip.month, mode, travellers, ...data },
-      });
-      setSubmitted(ref);
-      toast.success("Reservation received. We will confirm by phone shortly.");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save reservation");
-    }
+    setWaMessage(
+      [
+        `*New Kakande Ministries Reservation* (Ref: ${ref})`,
+        "",
+        `Trip: ${trip.month}`,
+        `Travel mode: ${data.mode === "flight" ? `By flight · ${trip.flightDate}` : `By road · ${trip.roadDate}`}`,
+        `Travellers: ${data.travellers}`,
+        `Total (estimate): K${total.toLocaleString()} ZMW`,
+        "",
+        `Name: ${data.fullName}`,
+        `Phone: ${data.phone}`,
+        `Email: ${data.email}`,
+        data.passport ? `Passport: ${data.passport}` : "",
+        data.notes ? `Notes: ${data.notes}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    );
+    setSubmitted(ref);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    toast.success("Reservation received. Send it on WhatsApp to confirm.");
   };
 
   return (
@@ -195,6 +220,25 @@ const Kakande = () => {
                     Luskam agent will call you on the number you provided to confirm payment and travel
                     documentation.
                   </p>
+                  <div className="mt-6 rounded-md border border-border bg-background p-4 text-left">
+                    <div className="text-sm font-semibold text-foreground">Send your reservation on WhatsApp</div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Tap a number below to open WhatsApp with your reservation details prefilled, then press send.
+                    </p>
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                      {WHATSAPP_NUMBERS.map((n) => (
+                        <a
+                          key={n.number}
+                          href={whatsappLink(n.number, waMessage)}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="flex-1 rounded-md bg-[#25D366] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#1ebe5d]"
+                        >
+                          WhatsApp {n.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                   <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                     <a
                       href="tel:+260773918245"
