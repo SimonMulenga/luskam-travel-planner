@@ -220,6 +220,25 @@ const Kakande = () => {
                     Luskam agent will call you on the number you provided to confirm payment and travel
                     documentation.
                   </p>
+                  <div className="mt-6 rounded-md border border-border bg-background p-4 text-left">
+                    <div className="text-sm font-semibold text-foreground">Send your reservation on WhatsApp</div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Tap a number below to open WhatsApp with your reservation details prefilled, then press send.
+                    </p>
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                      {WHATSAPP_NUMBERS.map((n) => (
+                        <a
+                          key={n.number}
+                          href={whatsappLink(n.number, waMessage)}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="flex-1 rounded-md bg-[#25D366] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#1ebe5d]"
+                        >
+                          WhatsApp {n.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                   <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                     <a
                       href="tel:+260773918245"
