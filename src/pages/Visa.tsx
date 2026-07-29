@@ -44,6 +44,7 @@ const buildWhatsappMessage = (ref: string, form: Record<string, string>) =>
 const whatsappLink = (number: string, message: string) =>
   `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 
+
 const VisaPage = () => {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState<string | null>(null);
@@ -91,12 +92,9 @@ const VisaPage = () => {
           // continue to WhatsApp even if saving fails
         }
       }
-      const message = buildWhatsappMessage(ref, form);
-      WHATSAPP_NUMBERS.forEach((n, i) => {
-        setTimeout(() => window.open(whatsappLink(n.number, message), "_blank", "noopener,noreferrer"), i * 600);
-      });
       setSubmitted(ref);
       window.scrollTo({ top: 0, behavior: "smooth" });
+
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not submit application");
     }
@@ -122,8 +120,9 @@ const VisaPage = () => {
             <div className="mt-6 rounded-md bg-surface p-4 ring-1 ring-border">
               <div className="text-sm font-semibold text-foreground">Send your application on WhatsApp</div>
               <p className="mt-1 text-xs text-muted-foreground">
-                Two WhatsApp chats should have opened automatically. If not, tap a number below to send your details.
+                Tap a number below to open WhatsApp with your application details prefilled, then press send.
               </p>
+
               <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                 {WHATSAPP_NUMBERS.map((n) => (
                   <a
