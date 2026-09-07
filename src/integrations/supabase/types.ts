@@ -14,11 +14,76 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_pricing: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          currency: string
+          customer_price: number
+          duffel_booking_reference: string | null
+          duffel_offer_id: string | null
+          duffel_order_id: string | null
+          id: string
+          markup_amount: number
+          pricing_rule_id: string | null
+          pricing_rule_name: string | null
+          supplier_price: number
+          updated_at: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          customer_price: number
+          duffel_booking_reference?: string | null
+          duffel_offer_id?: string | null
+          duffel_order_id?: string | null
+          id?: string
+          markup_amount?: number
+          pricing_rule_id?: string | null
+          pricing_rule_name?: string | null
+          supplier_price: number
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          customer_price?: number
+          duffel_booking_reference?: string | null
+          duffel_offer_id?: string | null
+          duffel_order_id?: string | null
+          id?: string
+          markup_amount?: number
+          pricing_rule_id?: string | null
+          pricing_rule_name?: string | null
+          supplier_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_pricing_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_pricing_pricing_rule_id_fkey"
+            columns: ["pricing_rule_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           created_at: string
           currency: string
           details: Json
+          duffel_booking_reference: string | null
+          duffel_order_id: string | null
           id: string
           payment_status: string
           reference: string
@@ -33,6 +98,8 @@ export type Database = {
           created_at?: string
           currency?: string
           details?: Json
+          duffel_booking_reference?: string | null
+          duffel_order_id?: string | null
           id?: string
           payment_status?: string
           reference: string
@@ -47,6 +114,8 @@ export type Database = {
           created_at?: string
           currency?: string
           details?: Json
+          duffel_booking_reference?: string | null
+          duffel_order_id?: string | null
           id?: string
           payment_status?: string
           reference?: string
@@ -56,6 +125,114 @@ export type Database = {
           type?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      pricing_audit_log: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          id: string
+          new_value: Json | null
+          old_value: Json | null
+          pricing_rule_id: string | null
+          pricing_rule_name: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          pricing_rule_id?: string | null
+          pricing_rule_name?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          pricing_rule_id?: string | null
+          pricing_rule_name?: string | null
+        }
+        Relationships: []
+      }
+      pricing_rules: {
+        Row: {
+          airline_code: string | null
+          cabin_class: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string | null
+          destination_airport: string | null
+          id: string
+          is_active: boolean
+          is_domestic: boolean | null
+          markup_amount: number
+          markup_type: string
+          max_ticket_price: number | null
+          min_ticket_price: number | null
+          name: string
+          origin_airport: string | null
+          priority: number
+          rule_type: string
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          airline_code?: string | null
+          cabin_class?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          destination_airport?: string | null
+          id?: string
+          is_active?: boolean
+          is_domestic?: boolean | null
+          markup_amount?: number
+          markup_type?: string
+          max_ticket_price?: number | null
+          min_ticket_price?: number | null
+          name: string
+          origin_airport?: string | null
+          priority?: number
+          rule_type?: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          airline_code?: string | null
+          cabin_class?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          destination_airport?: string | null
+          id?: string
+          is_active?: boolean
+          is_domestic?: boolean | null
+          markup_amount?: number
+          markup_type?: string
+          max_ticket_price?: number | null
+          min_ticket_price?: number | null
+          name?: string
+          origin_airport?: string | null
+          priority?: number
+          rule_type?: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Relationships: []
       }
