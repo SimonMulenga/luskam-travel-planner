@@ -14,6 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_passengers: {
+        Row: {
+          created_at: string
+          date_of_birth: string | null
+          first_name: string
+          flight_booking_id: string
+          id: string
+          last_name: string
+          nationality: string | null
+          passenger_type: string
+          passport_expiry: string | null
+          passport_number: string | null
+          ticket_number: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          date_of_birth?: string | null
+          first_name: string
+          flight_booking_id: string
+          id?: string
+          last_name: string
+          nationality?: string | null
+          passenger_type?: string
+          passport_expiry?: string | null
+          passport_number?: string | null
+          ticket_number?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          date_of_birth?: string | null
+          first_name?: string
+          flight_booking_id?: string
+          id?: string
+          last_name?: string
+          nationality?: string | null
+          passenger_type?: string
+          passport_expiry?: string | null
+          passport_number?: string | null
+          ticket_number?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_passengers_flight_booking_id_fkey"
+            columns: ["flight_booking_id"]
+            isOneToOne: false
+            referencedRelation: "flight_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_payments: {
+        Row: {
+          amount: number
+          booking_id: string | null
+          created_at: string
+          currency: string
+          failure_reason: string | null
+          flight_booking_id: string | null
+          id: string
+          method: string | null
+          provider: string
+          raw: Json | null
+          status: string
+          transaction_reference: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          flight_booking_id?: string | null
+          id?: string
+          method?: string | null
+          provider?: string
+          raw?: Json | null
+          status?: string
+          transaction_reference?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          flight_booking_id?: string | null
+          id?: string
+          method?: string | null
+          provider?: string
+          raw?: Json | null
+          status?: string
+          transaction_reference?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_payments_flight_booking_id_fkey"
+            columns: ["flight_booking_id"]
+            isOneToOne: false
+            referencedRelation: "flight_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_pricing: {
         Row: {
           booking_id: string | null
@@ -77,6 +193,77 @@ export type Database = {
           },
         ]
       }
+      booking_segments: {
+        Row: {
+          aircraft: string | null
+          airline: string | null
+          airline_code: string | null
+          arrival_datetime: string | null
+          cabin_class: string | null
+          created_at: string
+          departure_datetime: string | null
+          destination_code: string | null
+          direction: string
+          duration_minutes: number | null
+          flight_booking_id: string
+          flight_number: string | null
+          id: string
+          origin_code: string | null
+          provider: string | null
+          provider_reference: string | null
+          segment_index: number
+          status: string | null
+        }
+        Insert: {
+          aircraft?: string | null
+          airline?: string | null
+          airline_code?: string | null
+          arrival_datetime?: string | null
+          cabin_class?: string | null
+          created_at?: string
+          departure_datetime?: string | null
+          destination_code?: string | null
+          direction?: string
+          duration_minutes?: number | null
+          flight_booking_id: string
+          flight_number?: string | null
+          id?: string
+          origin_code?: string | null
+          provider?: string | null
+          provider_reference?: string | null
+          segment_index?: number
+          status?: string | null
+        }
+        Update: {
+          aircraft?: string | null
+          airline?: string | null
+          airline_code?: string | null
+          arrival_datetime?: string | null
+          cabin_class?: string | null
+          created_at?: string
+          departure_datetime?: string | null
+          destination_code?: string | null
+          direction?: string
+          duration_minutes?: number | null
+          flight_booking_id?: string
+          flight_number?: string | null
+          id?: string
+          origin_code?: string | null
+          provider?: string | null
+          provider_reference?: string | null
+          segment_index?: number
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_segments_flight_booking_id_fkey"
+            columns: ["flight_booking_id"]
+            isOneToOne: false
+            referencedRelation: "flight_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           created_at: string
@@ -125,6 +312,324 @@ export type Database = {
           type?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      flight_bookings: {
+        Row: {
+          booking_id: string
+          booking_status: string
+          cabin_class: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          currency: string
+          customer_total: number | null
+          departure_date: string | null
+          destination_code: string | null
+          id: string
+          markup_total: number | null
+          origin_code: string | null
+          payment_status: string
+          pnr: string | null
+          pricing_rule_id: string | null
+          pricing_rule_name: string | null
+          provider: string
+          provider_booking_reference: string | null
+          provider_offer_id: string | null
+          return_date: string | null
+          supplier_total: number | null
+          ticket_status: string
+          trip_type: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          booking_id: string
+          booking_status?: string
+          cabin_class?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          currency?: string
+          customer_total?: number | null
+          departure_date?: string | null
+          destination_code?: string | null
+          id?: string
+          markup_total?: number | null
+          origin_code?: string | null
+          payment_status?: string
+          pnr?: string | null
+          pricing_rule_id?: string | null
+          pricing_rule_name?: string | null
+          provider?: string
+          provider_booking_reference?: string | null
+          provider_offer_id?: string | null
+          return_date?: string | null
+          supplier_total?: number | null
+          ticket_status?: string
+          trip_type?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          booking_id?: string
+          booking_status?: string
+          cabin_class?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          currency?: string
+          customer_total?: number | null
+          departure_date?: string | null
+          destination_code?: string | null
+          id?: string
+          markup_total?: number | null
+          origin_code?: string | null
+          payment_status?: string
+          pnr?: string | null
+          pricing_rule_id?: string | null
+          pricing_rule_name?: string | null
+          provider?: string
+          provider_booking_reference?: string | null
+          provider_offer_id?: string | null
+          return_date?: string | null
+          supplier_total?: number | null
+          ticket_status?: string
+          trip_type?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flight_bookings_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_bookings_pricing_rule_id_fkey"
+            columns: ["pricing_rule_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flight_provider_logs: {
+        Row: {
+          action: string
+          created_at: string
+          duration_ms: number | null
+          endpoint: string | null
+          error_code: string | null
+          error_message: string | null
+          http_status: number | null
+          id: string
+          meta: Json | null
+          provider: string
+          provider_reference: string | null
+          request_at: string
+          response_at: string | null
+          success: boolean
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          duration_ms?: number | null
+          endpoint?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          http_status?: number | null
+          id?: string
+          meta?: Json | null
+          provider: string
+          provider_reference?: string | null
+          request_at?: string
+          response_at?: string | null
+          success?: boolean
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          duration_ms?: number | null
+          endpoint?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          http_status?: number | null
+          id?: string
+          meta?: Json | null
+          provider?: string
+          provider_reference?: string | null
+          request_at?: string
+          response_at?: string | null
+          success?: boolean
+        }
+        Relationships: []
+      }
+      flight_results: {
+        Row: {
+          aircraft: string | null
+          airline: string | null
+          airline_code: string | null
+          arrival_datetime: string | null
+          bookable: boolean
+          cabin_class: string | null
+          created_at: string
+          currency: string | null
+          customer_price: number | null
+          departure_datetime: string | null
+          destination: string | null
+          destination_code: string | null
+          duration_minutes: number | null
+          flight_number: string | null
+          id: string
+          markup_amount: number | null
+          origin: string | null
+          origin_code: string | null
+          pricing_rule_id: string | null
+          provider: string
+          provider_reference: string | null
+          raw: Json | null
+          search_id: string
+          status: string | null
+          stops: number
+          supplier_price: number | null
+        }
+        Insert: {
+          aircraft?: string | null
+          airline?: string | null
+          airline_code?: string | null
+          arrival_datetime?: string | null
+          bookable?: boolean
+          cabin_class?: string | null
+          created_at?: string
+          currency?: string | null
+          customer_price?: number | null
+          departure_datetime?: string | null
+          destination?: string | null
+          destination_code?: string | null
+          duration_minutes?: number | null
+          flight_number?: string | null
+          id?: string
+          markup_amount?: number | null
+          origin?: string | null
+          origin_code?: string | null
+          pricing_rule_id?: string | null
+          provider: string
+          provider_reference?: string | null
+          raw?: Json | null
+          search_id: string
+          status?: string | null
+          stops?: number
+          supplier_price?: number | null
+        }
+        Update: {
+          aircraft?: string | null
+          airline?: string | null
+          airline_code?: string | null
+          arrival_datetime?: string | null
+          bookable?: boolean
+          cabin_class?: string | null
+          created_at?: string
+          currency?: string | null
+          customer_price?: number | null
+          departure_datetime?: string | null
+          destination?: string | null
+          destination_code?: string | null
+          duration_minutes?: number | null
+          flight_number?: string | null
+          id?: string
+          markup_amount?: number | null
+          origin?: string | null
+          origin_code?: string | null
+          pricing_rule_id?: string | null
+          provider?: string
+          provider_reference?: string | null
+          raw?: Json | null
+          search_id?: string
+          status?: string | null
+          stops?: number
+          supplier_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flight_results_pricing_rule_id_fkey"
+            columns: ["pricing_rule_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_results_search_id_fkey"
+            columns: ["search_id"]
+            isOneToOne: false
+            referencedRelation: "flight_searches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flight_searches: {
+        Row: {
+          adults: number
+          cabin_class: string
+          cache_key: string | null
+          children: number
+          created_at: string
+          departure_date: string
+          destination_code: string
+          error_message: string | null
+          expires_at: string
+          id: string
+          infants: number
+          origin_code: string
+          provider: string
+          result_count: number
+          return_date: string | null
+          status: string
+          trip_type: string
+          user_id: string | null
+        }
+        Insert: {
+          adults?: number
+          cabin_class?: string
+          cache_key?: string | null
+          children?: number
+          created_at?: string
+          departure_date: string
+          destination_code: string
+          error_message?: string | null
+          expires_at?: string
+          id?: string
+          infants?: number
+          origin_code: string
+          provider: string
+          result_count?: number
+          return_date?: string | null
+          status?: string
+          trip_type?: string
+          user_id?: string | null
+        }
+        Update: {
+          adults?: number
+          cabin_class?: string
+          cache_key?: string | null
+          children?: number
+          created_at?: string
+          departure_date?: string
+          destination_code?: string
+          error_message?: string | null
+          expires_at?: string
+          id?: string
+          infants?: number
+          origin_code?: string
+          provider?: string
+          result_count?: number
+          return_date?: string | null
+          status?: string
+          trip_type?: string
+          user_id?: string | null
         }
         Relationships: []
       }
