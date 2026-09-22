@@ -188,10 +188,12 @@ export class FlightApiProvider extends BaseFlightProvider {
   }
 
   /** Flight tracking by flight number, e.g. name=ET, num=863. */
-  async trackFlight(airlineCode: string, flightNumber: string) {
+  async trackFlight(airlineCode: string, flightNumber: string, date?: string) {
     const key = apiKey();
-    const path = `/airline/${key}?num=${encodeURIComponent(flightNumber)}&name=${encodeURIComponent(airlineCode)}`;
-    return await call<unknown>(path, "trackFlight", { airlineCode, flightNumber });
+    const num = flightNumber.replace(/[^0-9]/g, "");
+    const day = date ?? new Date().toISOString().slice(0, 10);
+    const path = `/airline/${key}?num=${encodeURIComponent(num)}&name=${encodeURIComponent(airlineCode.toUpperCase())}&date=${day}`;
+    return await call<unknown>(path, "trackFlight", { airlineCode, flightNumber: num, date: day });
   }
 
   /** Airport schedule: mode = departures | arrivals, day 1 = today. */
