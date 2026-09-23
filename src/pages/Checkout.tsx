@@ -23,7 +23,7 @@ const Checkout = () => {
   const totalPax = adults + children + infants;
   const offerId = params.get("offer") || "";
 
-  const offer = useMemo(() => generateFlights(from, to, depart, cabin).find((o) => o.id === offerId), [from, to, depart, cabin, offerId]);
+  const offer = useMemo(() => readOffer(offerId), [offerId]);
 
   const [pax, setPax] = useState(
     Array.from({ length: totalPax }, (_, i) => ({
@@ -53,16 +53,16 @@ const Checkout = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container py-16 text-center">
-          <p className="text-muted-foreground">Offer not found.</p>
+          <p className="text-muted-foreground">This flight is no longer held. Please search again to see current availability.</p>
           <button onClick={() => navigate(-1)} className="mt-4 text-primary underline">Go back</button>
         </main>
       </div>
     );
   }
 
-  const subtotal = offer.price * totalPax;
-  const taxes = Math.round(subtotal * 0.18);
-  const total = subtotal + taxes;
+  // The customer price comes from the server pricing engine. Nothing is calculated here.
+  const hasFare = offer.priced && offer.price != null;
+  const total = hasFare ? (offer.price as number) * totalPax : 0;
 
   const update = (i: number, k: string, v: string) =>
     setPax((p) => p.map((x, idx) => (idx === i ? { ...x, [k]: v } : x)));
