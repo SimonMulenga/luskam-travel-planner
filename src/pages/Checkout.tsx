@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { generateFlights, airportLabel } from "@/data/flights";
+import { airportLabel } from "@/data/flights";
+import { readOffer } from "@/lib/flightOffer";
 import { format, parseISO } from "date-fns";
 import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -22,7 +23,7 @@ const Checkout = () => {
   const totalPax = adults + children + infants;
   const offerId = params.get("offer") || "";
 
-  const offer = useMemo(() => generateFlights(from, to, depart, cabin).find((o) => o.id === offerId), [from, to, depart, cabin, offerId]);
+  const offer = useMemo(() => readOffer(offerId), [offerId]);
 
   const [pax, setPax] = useState(
     Array.from({ length: totalPax }, (_, i) => ({
@@ -52,16 +53,16 @@ const Checkout = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container py-16 text-center">
-          <p className="text-muted-foreground">Offer not found.</p>
+          <p className="text-muted-foreground">This flight is no longer held. Please search again to see current availability.</p>
           <button onClick={() => navigate(-1)} className="mt-4 text-primary underline">Go back</button>
         </main>
       </div>
     );
   }
 
-  const subtotal = offer.price * totalPax;
-  const taxes = Math.round(subtotal * 0.18);
-  const total = subtotal + taxes;
+  // The customer price comes from the server pricing engine. Nothing is calculated here.
+  const hasFare = offer.priced && offer.price != null;
+  const total = hasFare ? (offer.price as number) * totalPax : 0;
 
   const update = (i: number, k: string, v: string) =>
     setPax((p) => p.map((x, idx) => (idx === i ? { ...x, [k]: v } : x)));
@@ -108,9 +109,9 @@ const Checkout = () => {
             <div className="flex items-start gap-4">
               <CheckCircle2 className="h-10 w-10 text-primary" />
               <div>
-                <h1 className="text-2xl font-semibold text-foreground">Reservation received</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Request received</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  We've held your seats. Complete payment to confirm — an agent will contact {contact.email} within a few minutes.
+                  Online ticketing is being connected, so our travel desk completes this booking for you. An agent will contact {contact.email} shortly to confirm the fare and issue your ticket.
                 </p>
               </div>
             </div>
@@ -123,7 +124,7 @@ const Checkout = () => {
               <div><dt className="text-muted-foreground">Departure</dt><dd className="font-medium text-foreground">{format(parseISO(depart), "dd MMM yyyy")}</dd></div>
               <div><dt className="text-muted-foreground">Airline</dt><dd className="font-medium text-foreground">{offer.airline} {offer.code}</dd></div>
               <div><dt className="text-muted-foreground">Travelers</dt><dd className="font-medium text-foreground">{totalPax}</dd></div>
-              <div className="col-span-2"><dt className="text-muted-foreground">Amount due</dt><dd className="font-semibold text-foreground text-lg">${total}</dd></div>
+              <div className="col-span-2"><dt className="text-muted-foreground">Amount due</dt><dd className="font-semibold text-foreground text-lg">{hasFare ? `$${total}` : "Confirmed by our travel desk"}</dd></div>
             </dl>
 
             <div className="mt-6 rounded-md bg-primary/5 p-4 ring-1 ring-primary/20">
@@ -135,7 +136,7 @@ const Checkout = () => {
               </ul>
               <div className="mt-3 flex flex-wrap gap-2">
                 <a
-                  href={`https://wa.me/260773918145?text=${encodeURIComponent(`Hello, I have just made a reservation ${confirmed} for $${total}. I'd like to complete payment.`)}`}
+                  href={`https://wa.me/260773918145?text=${encodeURIComponent(`Hello, I have just made request ${confirmed}${hasFare ? ` for $${total}` : ""}. I'd like to complete my booking.`)}`}
                   target="_blank" rel="noreferrer"
                   className="rounded-md bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1ebe5d]"
                 >WhatsApp us to pay</a>
@@ -231,14 +232,24 @@ const Checkout = () => {
               <div className="text-muted-foreground">{offer.fareType}</div>
             </div>
             <dl className="mt-5 space-y-2 border-t border-border pt-5 text-sm">
-              <div className="flex justify-between"><dt className="text-muted-foreground">Fare × {totalPax}</dt><dd className="text-foreground">${subtotal}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Taxes & fees</dt><dd className="text-foreground">${taxes}</dd></div>
-              <div className="flex justify-between border-t border-border pt-3 text-base font-semibold"><dt className="text-foreground">Total</dt><dd className="text-foreground">${total}</dd></div>
+              {hasFare ? (
+                <>
+                  <div className="flex justify-between"><dt className="text-muted-foreground">Fare × {totalPax}</dt><dd className="text-foreground">${total}</dd></div>
+                  <div className="flex justify-between border-t border-border pt-3 text-base font-semibold"><dt className="text-foreground">Total</dt><dd className="text-foreground">${total}</dd></div>
+                </>
+              ) : (
+                <div className="text-muted-foreground">
+                  The fare for this flight is confirmed by our travel desk before payment. Send your details and we'll come back with the exact price.
+                </div>
+              )}
             </dl>
-            <button type="submit" className="mt-6 w-full rounded-md bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground hover:bg-[hsl(var(--accent-hover))]">
-              Reserve now — pay after
+            <div className="mt-5 rounded-md bg-surface p-3 text-xs text-muted-foreground ring-1 ring-border">
+              Online ticketing is being connected. Our travel desk completes this booking and confirms your ticket.
+            </div>
+            <button type="submit" className="mt-4 w-full rounded-md bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground hover:bg-[hsl(var(--accent-hover))]">
+              {hasFare ? "Reserve now — pay after" : "Send request to travel desk"}
             </button>
-            <p className="mt-3 text-[11px] text-muted-foreground">Reservation is instant. Payment instructions appear on the next screen. By reserving you agree to our terms of service.</p>
+            <p className="mt-3 text-[11px] text-muted-foreground">Your request is recorded instantly. Payment instructions appear on the next screen. By continuing you agree to our terms of service.</p>
           </aside>
         </form>
       </main>
