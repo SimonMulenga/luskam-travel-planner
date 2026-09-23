@@ -232,14 +232,24 @@ const Checkout = () => {
               <div className="text-muted-foreground">{offer.fareType}</div>
             </div>
             <dl className="mt-5 space-y-2 border-t border-border pt-5 text-sm">
-              <div className="flex justify-between"><dt className="text-muted-foreground">Fare × {totalPax}</dt><dd className="text-foreground">${subtotal}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Taxes & fees</dt><dd className="text-foreground">${taxes}</dd></div>
-              <div className="flex justify-between border-t border-border pt-3 text-base font-semibold"><dt className="text-foreground">Total</dt><dd className="text-foreground">${total}</dd></div>
+              {hasFare ? (
+                <>
+                  <div className="flex justify-between"><dt className="text-muted-foreground">Fare × {totalPax}</dt><dd className="text-foreground">${total}</dd></div>
+                  <div className="flex justify-between border-t border-border pt-3 text-base font-semibold"><dt className="text-foreground">Total</dt><dd className="text-foreground">${total}</dd></div>
+                </>
+              ) : (
+                <div className="text-muted-foreground">
+                  The fare for this flight is confirmed by our travel desk before payment. Send your details and we'll come back with the exact price.
+                </div>
+              )}
             </dl>
-            <button type="submit" className="mt-6 w-full rounded-md bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground hover:bg-[hsl(var(--accent-hover))]">
-              Reserve now — pay after
+            <div className="mt-5 rounded-md bg-surface p-3 text-xs text-muted-foreground ring-1 ring-border">
+              Online ticketing is being connected. Our travel desk completes this booking and confirms your ticket.
+            </div>
+            <button type="submit" className="mt-4 w-full rounded-md bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground hover:bg-[hsl(var(--accent-hover))]">
+              {hasFare ? "Reserve now — pay after" : "Send request to travel desk"}
             </button>
-            <p className="mt-3 text-[11px] text-muted-foreground">Reservation is instant. Payment instructions appear on the next screen. By reserving you agree to our terms of service.</p>
+            <p className="mt-3 text-[11px] text-muted-foreground">Your request is recorded instantly. Payment instructions appear on the next screen. By continuing you agree to our terms of service.</p>
           </aside>
         </form>
       </main>
