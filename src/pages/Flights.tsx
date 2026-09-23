@@ -2,10 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Plane, ArrowRight, Radio, Loader2 } from "lucide-react";
-import { generateFlights, airportLabel, type FlightOffer } from "@/data/flights";
+import { Plane, ArrowRight, Radio, Loader2, Info } from "lucide-react";
+import { airportLabel } from "@/data/flights";
 import { format, parseISO } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
+import { storeOffer, type SelectedOffer } from "@/lib/flightOffer";
+
+interface ServerOffer extends SelectedOffer {
+  live?: boolean;
+}
 
 const FlightsPage = () => {
   const [params] = useSearchParams();
@@ -22,47 +27,59 @@ const FlightsPage = () => {
   const trip = params.get("trip") || "return";
   const totalPax = adults + children + infants;
 
-  const generated = useMemo(() => generateFlights(from, to, depart, cabin), [from, to, depart, cabin]);
-  const [liveOffers, setLiveOffers] = useState<FlightOffer[]>([]);
-  const [liveLoading, setLiveLoading] = useState(true);
-  const [liveError, setLiveError] = useState<string | null>(null);
+  const [offers, setOffers] = useState<ServerOffer[]>([]);
+  const [source, setSource] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState<string | null>(null);
   const [sort, setSort] = useState<"price" | "duration" | "depart">("price");
   const [stopFilter, setStopFilter] = useState<"all" | "direct" | "1stop">("all");
 
   useEffect(() => {
     let cancelled = false;
-    setLiveLoading(true);
-    setLiveError(null);
+    setLoading(true);
+    setNotice(null);
+    setOffers([]);
     supabase.functions
-      .invoke("flight-search", { body: { from, to, depart, cabin } })
+      .invoke("flight-search", {
+        body: { from, to, depart, ret: ret || null, cabin, adults, children, infants },
+      })
       .then(({ data, error }) => {
         if (cancelled) return;
         if (error) {
-          setLiveError("Live search unavailable — showing indicative options.");
-        } else {
-          const arr = ((data as { flights?: FlightOffer[] })?.flights ?? []) as FlightOffer[];
-          setLiveOffers(arr);
+          setNotice("Flight service is temporarily unavailable. Please try again shortly.");
+          return;
         }
+        const d = data as { flights?: ServerOffer[]; warning?: string; source?: string };
+        setOffers(d?.flights ?? []);
+        setSource(d?.source ?? "");
+        if (d?.warning) setNotice(d.warning);
       })
-      .finally(() => !cancelled && setLiveLoading(false));
+      .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
     };
-  }, [from, to, depart, cabin]);
+  }, [from, to, depart, ret, cabin, adults, children, infants]);
 
-  const offers = liveOffers.length ? [...liveOffers, ...generated] : generated;
+  const filtered = useMemo(
+    () =>
+      offers
+        .filter((o) =>
+          stopFilter === "all" ? true : stopFilter === "direct" ? o.stops === "Direct" : o.stops !== "Direct",
+        )
+        .sort((a, b) => {
+          if (sort === "price") return (a.price ?? Infinity) - (b.price ?? Infinity);
+          if (sort === "depart") return a.depart.localeCompare(b.depart);
+          return parseInt(a.duration) - parseInt(b.duration);
+        }),
+    [offers, sort, stopFilter],
+  );
 
-  const filtered = offers
-    .filter((o) => (stopFilter === "all" ? true : stopFilter === "direct" ? o.stops === "Direct" : o.stops !== "Direct"))
-    .sort((a, b) => {
-      if (sort === "price") return a.price - b.price;
-      if (sort === "depart") return a.depart.localeCompare(b.depart);
-      return parseInt(a.duration) - parseInt(b.duration);
-    });
+  const priced = filtered.filter((o) => o.priced).length;
 
-  const select = (id: string) => {
+  const select = (offer: ServerOffer) => {
+    storeOffer(offer);
     const sp = new URLSearchParams(params);
-    sp.set("offer", id);
+    sp.set("offer", offer.id);
     navigate(`/checkout?${sp.toString()}`);
   };
 
@@ -111,20 +128,38 @@ const FlightsPage = () => {
           </aside>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">{filtered.length} results · prices in USD per traveler</span>
-              {liveLoading ? (
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+              <span className="text-muted-foreground">
+                {loading ? "Searching…" : `${filtered.length} results`}
+                {priced > 0 && " · prices in USD per traveler"}
+              </span>
+              {loading ? (
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Loader2 className="h-3 w-3 animate-spin" /> Fetching live schedules…
+                  <Loader2 className="h-3 w-3 animate-spin" /> Checking live availability…
                 </span>
-              ) : liveOffers.length > 0 ? (
+              ) : source === "live_fares" ? (
                 <span className="flex items-center gap-1.5 text-xs font-medium text-primary">
-                  <Radio className="h-3 w-3" /> {liveOffers.length} live schedules
+                  <Radio className="h-3 w-3" /> Live fares
                 </span>
-              ) : liveError ? (
-                <span className="text-xs text-muted-foreground">{liveError}</span>
+              ) : source === "flight_information" ? (
+                <span className="text-xs text-muted-foreground">Flight information — fares confirmed by our travel desk</span>
               ) : null}
             </div>
+
+            {notice && !loading && (
+              <div className="flex items-start gap-2 rounded-md bg-surface p-3 text-sm text-muted-foreground ring-1 ring-border">
+                <Info className="mt-0.5 h-4 w-4 shrink-0" /> {notice}
+              </div>
+            )}
+
+            {!loading && filtered.length === 0 && (
+              <div className="rounded-lg bg-card p-10 text-center ring-1 ring-border">
+                <p className="text-sm text-muted-foreground">
+                  No flights found for this route and date. Try a nearby date, or contact our travel desk and we'll source it for you.
+                </p>
+              </div>
+            )}
+
             {filtered.map((r) => (
               <article key={r.id} className="grid grid-cols-12 items-center gap-4 rounded-lg bg-card px-5 py-5 ring-1 ring-border">
                 <div className="col-span-12 flex items-center gap-3 sm:col-span-3">
@@ -132,12 +167,7 @@ const FlightsPage = () => {
                     <Plane className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                      {r.airline}
-                      {r.live && (
-                        <span className="rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">Live</span>
-                      )}
-                    </div>
+                    <div className="text-sm font-semibold text-foreground">{r.airline}</div>
                     <div className="text-xs text-muted-foreground">{r.code} · {r.fareType}</div>
                   </div>
                 </div>
@@ -157,15 +187,24 @@ const FlightsPage = () => {
                   </div>
                 </div>
                 <div className="col-span-7 sm:col-span-2 sm:text-right">
-                  <div className="text-lg font-semibold text-foreground">${r.price * totalPax}</div>
-                  <div className="text-xs text-muted-foreground">${r.price} × {totalPax}</div>
+                  {r.priced && r.price != null ? (
+                    <>
+                      <div className="text-lg font-semibold text-foreground">${r.price * totalPax}</div>
+                      <div className="text-xs text-muted-foreground">${r.price} × {totalPax}</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-sm font-semibold text-foreground">Fare on request</div>
+                      <div className="text-xs text-muted-foreground">{r.status ?? "Schedule information"}</div>
+                    </>
+                  )}
                 </div>
                 <div className="col-span-5 flex justify-end sm:col-span-2">
                   <button
-                    onClick={() => select(r.id)}
+                    onClick={() => select(r)}
                     className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-[hsl(var(--primary-hover))]"
                   >
-                    Select
+                    {r.priced ? "Select" : "Request"}
                   </button>
                 </div>
               </article>
