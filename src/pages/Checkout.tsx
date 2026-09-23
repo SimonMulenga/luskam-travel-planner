@@ -109,9 +109,9 @@ const Checkout = () => {
             <div className="flex items-start gap-4">
               <CheckCircle2 className="h-10 w-10 text-primary" />
               <div>
-                <h1 className="text-2xl font-semibold text-foreground">Reservation received</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Request received</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  We've held your seats. Complete payment to confirm — an agent will contact {contact.email} within a few minutes.
+                  Online ticketing is being connected, so our travel desk completes this booking for you. An agent will contact {contact.email} shortly to confirm the fare and issue your ticket.
                 </p>
               </div>
             </div>
@@ -124,7 +124,7 @@ const Checkout = () => {
               <div><dt className="text-muted-foreground">Departure</dt><dd className="font-medium text-foreground">{format(parseISO(depart), "dd MMM yyyy")}</dd></div>
               <div><dt className="text-muted-foreground">Airline</dt><dd className="font-medium text-foreground">{offer.airline} {offer.code}</dd></div>
               <div><dt className="text-muted-foreground">Travelers</dt><dd className="font-medium text-foreground">{totalPax}</dd></div>
-              <div className="col-span-2"><dt className="text-muted-foreground">Amount due</dt><dd className="font-semibold text-foreground text-lg">${total}</dd></div>
+              <div className="col-span-2"><dt className="text-muted-foreground">Amount due</dt><dd className="font-semibold text-foreground text-lg">{hasFare ? `$${total}` : "Confirmed by our travel desk"}</dd></div>
             </dl>
 
             <div className="mt-6 rounded-md bg-primary/5 p-4 ring-1 ring-primary/20">
@@ -136,7 +136,7 @@ const Checkout = () => {
               </ul>
               <div className="mt-3 flex flex-wrap gap-2">
                 <a
-                  href={`https://wa.me/260773918145?text=${encodeURIComponent(`Hello, I have just made a reservation ${confirmed} for $${total}. I'd like to complete payment.`)}`}
+                  href={`https://wa.me/260773918145?text=${encodeURIComponent(`Hello, I have just made request ${confirmed}${hasFare ? ` for $${total}` : ""}. I'd like to complete my booking.`)}`}
                   target="_blank" rel="noreferrer"
                   className="rounded-md bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1ebe5d]"
                 >WhatsApp us to pay</a>
