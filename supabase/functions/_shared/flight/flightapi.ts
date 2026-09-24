@@ -132,6 +132,10 @@ export class FlightApiProvider extends BaseFlightProvider {
       returnDate: q.returnDate ?? null,
       cabin: q.cabinClass,
     });
+    const msg = (body as { message?: string }).message;
+    if (msg && !body.itineraries) {
+      throw new ProviderError("Live fares are temporarily unavailable (pricing quota reached). Please contact our travel desk.", /quota|limit/i.test(msg) ? "RATE_LIMIT" : "PROVIDER_ERROR", 429);
+    }
 
     const places = new Map((body.places ?? []).map((p) => [p.id, p]));
     const carriers = new Map((body.carriers ?? []).map((c) => [c.id, c]));
