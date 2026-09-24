@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoles, type AppRole } from "@/hooks/useRoles";
 import { toast } from "sonner";
+import { FlightPricing } from "@/components/admin/FlightPricing";
 import { format } from "date-fns";
 import { Loader2, Shield, Users, Package, TrendingUp, UserPlus, Trash2 } from "lucide-react";
 
@@ -35,7 +36,7 @@ interface RoleRow {
 const AdminPage = () => {
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, isAgent, loading: rolesLoading } = useRoles();
-  const [tab, setTab] = useState<"bookings" | "team">("bookings");
+  const [tab, setTab] = useState<"bookings" | "team" | "pricing">("bookings");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [roleRows, setRoleRows] = useState<RoleRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -173,6 +174,12 @@ const AdminPage = () => {
           >
             Bookings & Reservations
           </button>
+          <button
+            onClick={() => setTab("pricing")}
+            className={`border-b-2 px-1 pb-3 text-sm font-medium ${tab === "pricing" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+          >
+            Flight Pricing
+          </button>
           {isAdmin && (
             <button
               onClick={() => setTab("team")}
@@ -277,6 +284,12 @@ const AdminPage = () => {
               )}
             </div>
           </>
+        )}
+
+        {tab === "pricing" && (
+          <div className="mt-6">
+            <FlightPricing canEdit={isAdmin} />
+          </div>
         )}
 
         {tab === "team" && isAdmin && (
